@@ -4,10 +4,9 @@ public class D3 {
     数和商寄存器（并不需要单独设出，可以通过与D2相同的方式在被除数移位的过程中，空出来的一位一位的作为商）中
     0.初始化，要先在被除数的前面添加上n（n为被除数的位数）个0或者1（根据原有符号判断，原来最开始的符号位0就加0，为1就加1）
     1.左移剩余部分和商
-    2.执行"remainder - divisor"
-        a.如果这一步的结果为非负（寄存器的最高位为0），那么就把"部分商+被除数"的最后设为1
-        b.如果上一步的减法为负，（寄存器的最高位为1），那么就把"部分商+被除数"的最后设为0，然后恢复"部分商"寄存器的值
-        ，再把divisor加回去
+    2.比较"remainder 和 divisor"
+        a.如果remainder比divisor要大，那么就做减法，然后quotient的最后一位设为1
+        b.否则，最后一位设为0
     3.重复1-2步，被除数有多少位就重复多少次
     最后余数在remainder中，商在divisor中
     为了处理负数，我们考虑余数定义为D = Q * V + R
@@ -23,23 +22,62 @@ public class D3 {
 
     public void binaryDIVISION3(){
         for (int i = quotient.length - 1 ; i >= 0 ; i --){
+            //对两个寄存器进行移位
             remainder = LEFTMOVE(remainder);
             remainder[remainder.length - 1] = quotient[0];
             quotient = LEFTMOVE(quotient);
-            int[] temp = binarySub(remainder , divisor);
-            if (temp[0] == 0){
-                remainder = temp;
+
+            PRINT(remainder);
+            PRINT(quotient);
+            PRINT(divisor);
+            System.out.println();
+
+
+            if (Comparing(remainder,divisor)){
+                if (remainder[0] == divisor[0]){
+                    remainder = binarySub(remainder,divisor);
+                }
+                else {
+                    remainder = binaryAddition(remainder,divisor);
+                }
+
+
                 quotient[quotient.length - 1] = 1;
             }
             else {
-
+                quotient[quotient.length - 1] = 0;
             }
+
+
+
             PRINT(remainder);
             PRINT(quotient);
             PRINT(divisor);
             System.out.println();
         }
+
+        //If the dividend has the different sign with divisor, replace quotient with its complement
+        if (!(quotient[0] == divisor[0])){
+            int[] temp = new int[quotient.length];
+            for (int i = 0 ; i < quotient.length ; i ++){
+                temp[i] = 0 ;
+            }
+            temp[quotient.length - 1] = 1;
+            for (int i = 0 ; i < quotient.length ; i ++){
+                quotient[i] = 1 - quotient[i];
+            }
+            quotient = binaryAddition(quotient,temp);
+        }
+
+
+        System.out.println("最终的结果是：");
+        PRINT(remainder);
+        PRINT(quotient);
+        PRINT(divisor);
     }
+
+
+
 
     public void PRINT(int[]a){
         for (int i = 0 ; i < a.length ; i ++){
@@ -48,6 +86,23 @@ public class D3 {
         System.out.print(" ");
     }
 
+
+    public boolean Comparing(int[] a , int[] b){
+        if (a[0] == b[0]){
+            int[] temp = binarySub(a, b);
+            if (temp[0] == a[0]){
+                return true;
+            }
+            else return false;
+        }
+        else {
+            int[] temp = binaryAddition(a, b);
+            if (temp[0] == a[0]){
+             return true;
+            }
+            else return false;
+        }
+    }
 
 
     public int[] binarySub(int[] a , int[] b){
