@@ -35,6 +35,8 @@ public class M3 {
             }
 
 
+
+            
             for (int i = 0 ; i < BuFenJi.length ; i ++){
                 System.out.print(BuFenJi[i]);
             }
